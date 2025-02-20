@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro</title>
+    <!-- Tema oscuro de Bootswatch (Darkly) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/darkly/bootstrap.min.css">
+</head>
+<body>
+
+    <!-- Incluir la barra de navegación -->
+    <div th:replace="~{layout/navbar :: navbar}"></div>
+
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="card shadow-lg p-4 bg-dark text-white" style="width: 400px;">
+            <h1 class="text-center text-info mb-3"> Registro de Usuario</h1>
+
+            <form th:action="@{/registro}" th:object="${usuario}" method="post">
+                <!-- Usuario -->
+                <div class="mb-3">
+                    <label for="username" class="form-label"> Usuario</label>
+                    <input type="text" th:field="*{username}" class="form-control bg-secondary text-white" id="username" placeholder="Ingrese su usuario" required>
+                </div>
+
+                <!-- Contraseña -->
+                <div class="mb-3">
+                    <label for="password" class="form-label"> Contraseña</label>
+                    <input type="password" th:field="*{password}" class="form-control bg-secondary text-white" id="password" placeholder="Ingrese su contraseña" required>
+                </div>
+
+                <!-- Selección de Rol -->
+                <div class="mb-3">
+                    <label for="role" class="form-label"> Rol</label>
+                    <select th:field="*{role}" class="form-select bg-secondary text-white" id="role">
+                        <option value="USER">Usuario</option>
+                        <option value="ADMIN">Administrador</option>
+                    </select>
+                </div>
+
+                <!-- Botón Registrarse -->
+                <button type="submit" class="btn btn-success w-100"> Registrarse</button>
+
+                <!-- Botón Volver -->
+                <a th:href="${#authorization.expression('hasRole(''ADMIN'')') ? '/admin/dashboard' : '/home'}" 
+                   class="btn btn-primary w-100 mt-2">
+                    Volver
+                </a>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

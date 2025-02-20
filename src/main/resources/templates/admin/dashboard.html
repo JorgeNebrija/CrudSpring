@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>DashBoard Administrador</title>
+    <!-- Tema de Bootswatch (Flatly) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/flatly/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+    <!-- Incluir la barra de navegación -->
+    <div th:replace="~{layout/navbar :: navbar}"></div>
+
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="card shadow-lg p-4" style="width: 600px;">
+            <h1 class="text-center text-primary">Bienvenido, Administrador</h1>
+            <p class="text-center text-muted">Este es tu panel de administración.</p>
+
+            <!-- Botones de navegación -->
+            <div class="d-flex flex-column gap-3 mb-3">
+                <a href="/proyectos" class="btn btn-outline-primary"> Gestionar Proyectos</a>
+                <a href="/tareas" class="btn btn-outline-success"> Gestionar Tareas</a>
+                <a href="/registro" class="btn btn-outline-warning"> Gestionar Usuarios</a>
+            </div>
+
+            <!-- Botón de Cerrar Sesión -->
+            <form th:action="@{/logout}" method="post" class="text-center">
+                <button type="submit" class="btn btn-danger w-100"> Cerrar Sesión</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

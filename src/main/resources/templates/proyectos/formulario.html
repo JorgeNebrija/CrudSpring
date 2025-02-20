@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario de Proyecto</title>
+    <!-- Tema oscuro de Bootswatch (Darkly) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/darkly/bootstrap.min.css">
+</head>
+<body>
+
+    <!-- Barra de navegación -->
+    <div th:replace="~{layout/navbar :: navbar}"></div>
+
+    <div class="container mt-5">
+        <div class="card shadow-lg p-4 bg-dark text-white">
+            <h1 class="text-center mb-4" th:text="${proyecto.id == null ? 'Crear Proyecto' : 'Editar Proyecto'}"></h1>
+
+            <form th:action="@{/proyectos}" th:object="${proyecto}" method="post">
+                <!-- ID oculto si es una edición -->
+                <input type="hidden" th:if="${proyecto.id}" th:field="*{id}">
+
+                <!-- Nombre del Proyecto -->
+                <div class="mb-3">
+                    <label for="nombre" class="form-label"> Nombre</label>
+                    <input type="text" th:field="*{nombre}" class="form-control bg-secondary text-white" id="nombre" required>
+                </div>
+
+                <!-- Descripción del Proyecto -->
+                <div class="mb-3">
+                    <label for="descripcion" class="form-label"> Descripción</label>
+                    <textarea th:field="*{descripcion}" class="form-control bg-secondary text-white" id="descripcion" required></textarea>
+                </div>
+
+                <!-- Fecha de Inicio -->
+                <div class="mb-3">
+                    <label for="fechaInicio" class="form-label"> Fecha de Inicio</label>
+                    <input type="date" th:field="*{fechaInicio}" class="form-control bg-secondary text-white" id="fechaInicio" required>
+                </div>
+
+                <!-- Estado del Proyecto -->
+                <div class="mb-3">
+                    <label for="estado" class="form-label"> Estado</label>
+                    <select name="estado" id="estado" class="form-select bg-secondary text-white" required>
+                        <option value="ACTIVO" th:selected="${proyecto.estado == 'ACTIVO'}">Activo</option>
+                        <option value="EN_PROGRESO" th:selected="${proyecto.estado == 'EN_PROGRESO'}">En progreso</option>
+                        <option value="FINALIZADO" th:selected="${proyecto.estado == 'FINALIZADO'}">Finalizado</option>
+                    </select>
+                </div>
+
+                <!-- Selección de Tareas -->
+                <div class="mb-3">
+                    <label for="tareasSeleccionadas" class="form-label"> Seleccionar Tareas</label>
+                    <select multiple name="tareasSeleccionadas" class="form-select bg-secondary text-white" id="tareasSeleccionadas">
+                        <option th:each="tarea : ${tareas}" 
+                                th:value="${tarea.id}" 
+                                th:text="${tarea.titulo}" 
+                                th:selected="${proyecto.tareas != null && proyecto.tareas.contains(tarea)}">
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Botón Guardar -->
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success w-100"> Guardar Proyecto</button>
+                </div>
+            </form>
+
+            <!-- Botón para volver a la lista de proyectos -->
+            <div class="text-center mt-3">
+                <a href="/proyectos" class="btn btn-secondary w-100"> Volver a la Lista de Proyectos</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

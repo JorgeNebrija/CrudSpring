@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Tareas</title>
+    <!-- Tema oscuro de Bootswatch (Darkly) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/darkly/bootstrap.min.css">
+</head>
+<body>
+
+    <!-- Incluir la barra de navegación -->
+    <div th:replace="~{layout/navbar :: navbar}"></div>
+
+    <div class="container mt-5">
+        <div class="card shadow-lg p-4 bg-dark text-white">
+            <h1 class="text-center text-info mb-4"> Lista de Tareas</h1>
+
+            <!-- Botón para añadir tarea -->
+            <div class="text-end">
+                <a th:href="@{/tareas/crear}" class="btn btn-success mb-3"> Añadir Tarea</a>
+            </div>
+
+            <!-- Tabla de Tareas -->
+            <div class="table-responsive">
+                <table class="table table-hover table-dark">
+                    <thead class="table-primary text-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th> Título</th>
+                            <th> Descripción</th>
+                            <th> Fecha Límite</th>
+                            <th> Estado</th>
+                            <th> Proyecto</th>
+                            <th> Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="tarea : ${tareas}">
+                            <td th:text="${tarea.id}"></td>
+                            <td th:text="${tarea.titulo}"></td>
+                            <td th:text="${tarea.descripcion}"></td>
+                            <td th:text="${#temporals.format(tarea.fechaLimite, 'dd/MM/yyyy')}"></td>
+                            <td>
+                                <span th:text="${tarea.estado}" 
+                                      th:classappend="${tarea.estado == 'PENDIENTE' ? 'text-warning' : 
+                                                      (tarea.estado == 'EN_CURSO' ? 'text-primary' : 'text-success')}">
+                                </span>
+                            </td>
+                            <td th:text="${tarea.proyecto != null ? tarea.proyecto.nombre : 'Sin Proyecto'}"></td>
+                            <td class="text-center">
+                                <a th:href="@{/tareas/editar/{id}(id=${tarea.id})}" class="btn btn-warning btn-sm"> Editar</a>
+                                <a th:href="@{/tareas/eliminar/{id}(id=${tarea.id})}" 
+                                   class="btn btn-danger btn-sm" 
+                                   onclick="return confirm('¿Estás seguro de eliminar esta tarea?');"> Eliminar</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Botón Volver -->
+            <div class="text-center mt-3">
+                <a th:href="${#authorization.expression('hasRole(''ADMIN'')') ? '/admin/dashboard' : '/home'}" 
+                   class="btn btn-primary w-100">
+                    Volver
+                </a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

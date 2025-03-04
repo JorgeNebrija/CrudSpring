@@ -1,21 +1,12 @@
 package com.example.crudusuario.repository;
-
-import com.example.crudusuario.model.Tarea;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
+import com.example.crudusuario.model.Tarea;
 
-/**
- * La interfaz TareaRepository es un repositorio JPA que permite realizar 
- * operaciones CRUD (Create, Read, Update, Delete) sobre la entidad Tarea.
- */
 public interface TareaRepository extends JpaRepository<Tarea, Long> {
 
-    /**
-     * Método personalizado para encontrar todas las tareas asociadas a un proyecto específico.
-     * Spring Data JPA generará automáticamente la consulta basada en el nombre del método.
-     *
-     * @param proyectoId Identificador del proyecto.
-     * @return Lista de tareas que pertenecen al proyecto con el ID dado.
-     */
-    List<Tarea> findByProyectoId(Long proyectoId);
+    @Query("SELECT t FROM Tarea t JOIN t.proyectos p WHERE p.id = :proyectoId")
+    List<Tarea> findByProyecto(@Param("proyectoId") Long proyectoId);
 }

@@ -1,94 +1,82 @@
 package com.example.crudusuario.service;
 
 import com.example.crudusuario.model.Tarea;
+import com.example.crudusuario.model.Proyecto;
 import com.example.crudusuario.repository.TareaRepository;
+import com.example.crudusuario.repository.ProyectoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.HashSet;
 
-/**
- * Servicio que maneja la lógica de negocio para la entidad Tarea.
- * Proporciona métodos para listar, obtener, guardar, actualizar y eliminar tareas.
- */
-@Service // Marca esta clase como un servicio gestionado por Spring
+@Service
 public class TareaService {
 
-    private final TareaRepository tareaRepository; // Repositorio para acceder a la base de datos de tareas
+    private final TareaRepository tareaRepository;
+    private final ProyectoRepository proyectoRepository;
 
-    /**
-     * Constructor que inyecta el repositorio de tareas.
-     * @param tareaRepository Repositorio JPA para la gestión de tareas.
-     */
-    public TareaService(TareaRepository tareaRepository) {
+    public TareaService(TareaRepository tareaRepository, ProyectoRepository proyectoRepository) {
         this.tareaRepository = tareaRepository;
+        this.proyectoRepository = proyectoRepository;
     }
 
-    /**
-     * Obtiene la lista de todas las tareas almacenadas en la base de datos.
-     * @return Lista de tareas.
-     */
     public List<Tarea> listarTareas() {
         return tareaRepository.findAll();
     }
 
-    /**
-     * Obtiene todas las tareas asociadas a un proyecto específico.
-     * @param proyectoId Identificador del proyecto.
-     * @return Lista de tareas pertenecientes al proyecto.
-     */
-    public List<Tarea> listarTareasPorProyecto(Long proyectoId) {
-        return tareaRepository.findByProyectoId(proyectoId);
-    }
-
-    /**
-     * Busca una tarea por su ID.
-     * @param id Identificador de la tarea.
-     * @return Un Optional que contiene la tarea si existe.
-     */
     public Optional<Tarea> obtenerTareaPorId(Long id) {
         return tareaRepository.findById(id);
     }
 
-    /**
-     * Obtiene una lista de tareas por sus identificadores.
-     * @param ids Lista de identificadores de tareas.
-     * @return Lista de tareas encontradas.
-     */
-    public List<Tarea> obtenerTareasPorIds(List<Long> ids) {
-        return tareaRepository.findAllById(ids);
+    public Set<Tarea> obtenerTareasPorIds(List<Long> ids) {
+        return new HashSet<>(tareaRepository.findAllById(ids));
     }
 
-    /**
-     * Guarda una nueva tarea en la base de datos.
-     * @param tarea Objeto Tarea a guardar.
-     * @return Tarea guardada.
-     */
-    public Tarea guardarTarea(Tarea tarea) {
+    public Tarea guardarTarea(Tarea tarea, List<Long> proyectosSeleccionados) {
+        if (proyectosSeleccionados != null && !proyectosSeleccionados.isEmpty()) {
+            Set<Proyecto> proyectos = new HashSet<>(proyectoRepository.findAllById(proyectosSeleccionados));
+    
+            // Añadimos la tarea a cada proyecto para mantener la relación bidireccional
+            for (Proyecto proyecto : proyectos) {
+                proyecto.getTareas().add(tarea);
+            }
+    
+            tarea.setProyectos(proyectos);
+        }
+    
         return tareaRepository.save(tarea);
     }
+    
 
-    /**
-     * Actualiza una tarea existente en la base de datos.
-     * Si la tarea no existe, lanza una excepción.
-     * @param id Identificador de la tarea a actualizar.
-     * @param tareaActualizada Datos nuevos de la tarea.
-     * @return Tarea actualizada.
-     */
-    public Tarea actualizarTarea(Long id, Tarea tareaActualizada) {
+    public Tarea actualizarTarea(Long id, Tarea tareaActualizada, List<Long> proyectosSeleccionados) {
         return tareaRepository.findById(id).map(tarea -> {
             tarea.setTitulo(tareaActualizada.getTitulo());
             tarea.setDescripcion(tareaActualizada.getDescripcion());
             tarea.setFechaLimite(tareaActualizada.getFechaLimite());
             tarea.setEstado(tareaActualizada.getEstado());
+    
+            if (proyectosSeleccionados != null) {
+                Set<Proyecto> proyectos = new HashSet<>(proyectoRepository.findAllById(proyectosSeleccionados));
+    
+                // Primero eliminamos la tarea de los proyectos anteriores
+                for (Proyecto proyecto : tarea.getProyectos()) {
+                    proyecto.getTareas().remove(tarea);
+                }
+    
+                // Ahora la añadimos a los nuevos proyectos
+                for (Proyecto proyecto : proyectos) {
+                    proyecto.getTareas().add(tarea);
+                }
+    
+                tarea.setProyectos(proyectos);
+            }
+    
             return tareaRepository.save(tarea);
         }).orElseThrow(() -> new RuntimeException("Tarea no encontrada"));
     }
-
-    /**
-     * Elimina una tarea de la base de datos por su ID.
-     * @param id Identificador de la tarea a eliminar.
-     */
+    
     public void eliminarTarea(Long id) {
         tareaRepository.deleteById(id);
     }

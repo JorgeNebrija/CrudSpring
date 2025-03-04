@@ -30,7 +30,7 @@
                             <th> Descripción</th>
                             <th> Fecha Límite</th>
                             <th> Estado</th>
-                            <th> Proyecto</th>
+                            <th> Proyectos Asociados</th>
                             <th> Acciones</th>
                         </tr>
                     </thead>
@@ -46,7 +46,14 @@
                                                       (tarea.estado == 'EN_CURSO' ? 'text-primary' : 'text-success')}">
                                 </span>
                             </td>
-                            <td th:text="${tarea.proyecto != null ? tarea.proyecto.nombre : 'Sin Proyecto'}"></td>
+                            <td>
+                                <ul class="list-unstyled">
+                                    <li th:if="${not #lists.isEmpty(tarea.proyectos)}" 
+                                        th:each="proyecto : ${tarea.proyectos}" th:text="${proyecto.nombre}">
+                                    </li>
+                                    <li th:if="${#lists.isEmpty(tarea.proyectos)}">Sin proyectos asociados</li>
+                                </ul>
+                            </td>
                             <td class="text-center">
                                 <a th:href="@{/tareas/editar/{id}(id=${tarea.id})}" class="btn btn-warning btn-sm"> Editar</a>
                                 <a th:href="@{/tareas/eliminar/{id}(id=${tarea.id})}" 
@@ -60,10 +67,7 @@
 
             <!-- Botón Volver -->
             <div class="text-center mt-3">
-                <a th:href="${#authorization.expression('hasRole(''ADMIN'')') ? '/admin/dashboard' : '/home'}" 
-                   class="btn btn-primary w-100">
-                    Volver
-                </a>
+                <a href="/home" class="btn btn-primary w-100"> Volver</a>
             </div>
         </div>
     </div>

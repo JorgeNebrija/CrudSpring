@@ -1,82 +1,64 @@
 package com.example.crudusuario.service;
 
 import com.example.crudusuario.model.Proyecto;
+import com.example.crudusuario.model.Tarea;
 import com.example.crudusuario.repository.ProyectoRepository;
+import com.example.crudusuario.repository.TareaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.HashSet;
 
-/**
- * Servicio que maneja la lógica de negocio para la entidad Proyecto.
- * Proporciona métodos para listar, obtener, guardar, actualizar y eliminar proyectos.
- */
-@Service // Marca esta clase como un servicio gestionado por Spring
+@Service
 public class ProyectoService {
     
-    private final ProyectoRepository proyectoRepository; // Repositorio de proyectos
+    private final ProyectoRepository proyectoRepository;
+    private final TareaRepository tareaRepository;
 
-    /**
-     * Constructor que inyecta el repositorio de proyectos.
-     * @param proyectoRepository Repositorio JPA para acceder a los proyectos.
-     */
-    public ProyectoService(ProyectoRepository proyectoRepository) {
+    public ProyectoService(ProyectoRepository proyectoRepository, TareaRepository tareaRepository) {
         this.proyectoRepository = proyectoRepository;
+        this.tareaRepository = tareaRepository;
     }
 
-    /**
-     * Obtiene la lista de todos los proyectos almacenados en la base de datos.
-     * @return Lista de proyectos.
-     */
     public List<Proyecto> listarProyectos() {
         return proyectoRepository.findAll();
     }
 
-    /**
-     * Busca un proyecto por su ID.
-     * @param id Identificador del proyecto.
-     * @return Un Optional que contiene el proyecto si existe.
-     */
     public Optional<Proyecto> obtenerProyectoPorId(Long id) {
         return proyectoRepository.findById(id);
     }
 
-    /**
-     * Guarda un nuevo proyecto en la base de datos.
-     * @param proyecto Objeto Proyecto a guardar.
-     * @return Proyecto guardado.
-     */
-    public Proyecto guardarProyecto(Proyecto proyecto) {
+    public Set<Proyecto> obtenerProyectosPorIds(List<Long> ids) {
+        return new HashSet<>(proyectoRepository.findAllById(ids));
+    }
+
+    public Proyecto guardarProyecto(Proyecto proyecto, List<Long> tareasSeleccionadas) {
+        if (tareasSeleccionadas != null && !tareasSeleccionadas.isEmpty()) {
+            Set<Tarea> tareas = new HashSet<>(tareaRepository.findAllById(tareasSeleccionadas));
+            proyecto.setTareas(tareas);
+        }
         return proyectoRepository.save(proyecto);
     }
 
-    /**
-     * Actualiza un proyecto existente en la base de datos.
-     * Si el proyecto no existe, lanza una excepción.
-     * @param id Identificador del proyecto a actualizar.
-     * @param proyectoActualizado Datos nuevos del proyecto.
-     * @return Proyecto actualizado.
-     */
-    public Proyecto actualizarProyecto(Long id, Proyecto proyectoActualizado) {
+    public Proyecto actualizarProyecto(Long id, Proyecto proyectoActualizado, List<Long> tareasSeleccionadas) {
         return proyectoRepository.findById(id).map(proyecto -> {
             proyecto.setNombre(proyectoActualizado.getNombre());
             proyecto.setDescripcion(proyectoActualizado.getDescripcion());
             proyecto.setFechaInicio(proyectoActualizado.getFechaInicio());
             proyecto.setEstado(proyectoActualizado.getEstado());
-            proyecto.setTareas(proyectoActualizado.getTareas());
+
+            if (tareasSeleccionadas != null) {
+                Set<Tarea> tareas = new HashSet<>(tareaRepository.findAllById(tareasSeleccionadas));
+                proyecto.setTareas(tareas);
+            }
+
             return proyectoRepository.save(proyecto);
         }).orElseThrow(() -> new RuntimeException("Proyecto no encontrado"));
     }
 
-    /**
-     * Elimina un proyecto de la base de datos por su ID.
-     * @param id Identificador del proyecto a eliminar.
-     */
     public void eliminarProyecto(Long id) {
         proyectoRepository.deleteById(id);
     }
 }
- /*Aquí se trabaja con la bd y evito que los controladores trabajan con ella.
-  * Actuando como intermediario entre el controlador y el repositorio de datos.
-  Me encargo de la lógica de negocio relacionada con la gestión de proyectos
-  */

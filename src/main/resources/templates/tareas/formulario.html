@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Formulario de Tarea</title>
-    <!-- Tema oscuro de Bootswatch (Darkly) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/darkly/bootstrap.min.css">
 </head>
 <body>
 
-    <!-- Incluir la barra de navegación -->
     <div th:replace="~{layout/navbar :: navbar}"></div>
 
     <div class="container mt-5">
@@ -16,27 +14,23 @@
             <h1 class="text-center text-info mb-4" th:text="${#strings.isEmpty(tarea.id) ? 'Crear Tarea' : 'Editar Tarea'}"></h1>
 
             <form th:action="@{/tareas}" th:object="${tarea}" method="post">
-                <!-- Título de la tarea -->
                 <div class="mb-3">
-                    <label for="titulo" class="form-label"> Título</label>
+                    <label for="titulo" class="form-label">Título</label>
                     <input type="text" th:field="*{titulo}" class="form-control bg-secondary text-white" id="titulo" required>
                 </div>
 
-                <!-- Descripción de la tarea -->
                 <div class="mb-3">
-                    <label for="descripcion" class="form-label"> Descripción</label>
+                    <label for="descripcion" class="form-label">Descripción</label>
                     <textarea th:field="*{descripcion}" class="form-control bg-secondary text-white" id="descripcion" required></textarea>
                 </div>
 
-                <!-- Fecha límite -->
                 <div class="mb-3">
-                    <label for="fechaLimite" class="form-label"> Fecha límite</label>
+                    <label for="fechaLimite" class="form-label">Fecha límite</label>
                     <input type="date" th:field="*{fechaLimite}" class="form-control bg-secondary text-white" id="fechaLimite" required>
                 </div>
 
-                <!-- Estado de la tarea -->
                 <div class="mb-3">
-                    <label for="estado" class="form-label"> Estado</label>
+                    <label for="estado" class="form-label">Estado</label>
                     <select th:field="*{estado}" class="form-select bg-secondary text-white" id="estado" required>
                         <option value="PENDIENTE">Pendiente</option>
                         <option value="EN_CURSO">En curso</option>
@@ -44,23 +38,22 @@
                     </select>
                 </div>
 
-                <!-- Proyecto asociado -->
+                <!-- Selección de múltiples proyectos -->
                 <div class="mb-3">
-                    <label for="proyecto" class="form-label"> Proyecto</label>
-                    <select th:field="*{proyecto.id}" class="form-select bg-secondary text-white" id="proyecto" required>
+                    <label for="proyectos" class="form-label">Proyectos Asociados</label>
+                    <select th:field="*{proyectos}" multiple="multiple" class="form-select bg-secondary text-white" id="proyectos">
                         <option th:each="proyecto : ${proyectos}" th:value="${proyecto.id}" th:text="${proyecto.nombre}"></option>
                     </select>
+                    <small class="form-text text-muted">Mantén presionada la tecla Ctrl (Cmd en Mac) para seleccionar múltiples proyectos.</small>
                 </div>
 
-                <!-- Botón Guardar -->
                 <div class="text-center">
-                    <button type="submit" class="btn btn-success w-100"> Guardar Tarea</button>
+                    <button type="submit" class="btn btn-success w-100">Guardar Tarea</button>
                 </div>
             </form>
 
-            <!-- Botón para volver a la lista de tareas -->
             <div class="text-center mt-3">
-                <a th:href="@{/tareas}" class="btn btn-secondary w-100"> Volver a la Lista de Tareas</a>
+                <a th:href="@{/tareas}" class="btn btn-secondary w-100">Volver a la Lista de Tareas</a>
             </div>
         </div>
     </div>

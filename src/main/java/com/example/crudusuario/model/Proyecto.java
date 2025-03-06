@@ -2,8 +2,7 @@ package com.example.crudusuario.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "proyectos")
@@ -23,31 +22,35 @@ public class Proyecto {
     @Column(name = "estado", nullable = false)
     private EstadoProyecto estado;
 
-    @ManyToMany
-    @JoinTable(
-        name = "proyecto_tareas",
-        joinColumns = @JoinColumn(name = "proyecto_id"),
-        inverseJoinColumns = @JoinColumn(name = "tarea_id")
-    )
-    private Set<Tarea> tareas = new HashSet<>();
-    
+    @OneToMany(mappedBy = "proyecto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Tarea> tareas;  //Un proyecto puede tener muchas tareas
 
-    // Getters y Setters
-    public Long getId() { return id; }
+    public Proyecto() {}
+
+    public Proyecto(String nombre, String descripcion, LocalDate fechaInicio, EstadoProyecto estado) {
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.fechaInicio = fechaInicio;
+        this.estado = estado;
+    }
+
     public void setId(Long id) { this.id = id; }
+    public Long getId() { return id; }
 
-    public String getNombre() { return nombre; }
+
     public void setNombre(String nombre) { this.nombre = nombre; }
+    public String getNombre() { return nombre; }
 
-    public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public String getDescripcion() { return descripcion; }
 
-    public LocalDate getFechaInicio() { return fechaInicio; }
     public void setFechaInicio(LocalDate fechaInicio) { this.fechaInicio = fechaInicio; }
+    public LocalDate getFechaInicio() { return fechaInicio; }
 
-    public EstadoProyecto getEstado() { return estado; }
     public void setEstado(EstadoProyecto estado) { this.estado = estado; }
+    public EstadoProyecto getEstado() { return estado; }
 
-    public Set<Tarea> getTareas() { return tareas; }
-    public void setTareas(Set<Tarea> tareas) { this.tareas = tareas; }
+    public void setTareas(List<Tarea> tareas) { this.tareas = tareas; }
+    public List<Tarea> getTareas() { return tareas; }
+
 }

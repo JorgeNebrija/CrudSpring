@@ -8,9 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Controller
 @RequestMapping("/tareas")
@@ -25,53 +23,46 @@ public class TareaController {
     }
 
     @GetMapping
-public String listarTareas(Model model) {
-    List<Tarea> tareas = tareaService.listarTareas();
-    model.addAttribute("tareas", tareas);
-    return "tareas/lista";
-}
+    public String listarTareas(Model model) {
+        model.addAttribute("tareas", tareaService.listarTareas());
+        return "tareas/lista";
+    }
 
     @GetMapping("/crear")
     public String mostrarFormularioCrearTarea(Model model) {
         model.addAttribute("tarea", new Tarea());
-        model.addAttribute("proyectos", proyectoService.listarProyectos());
+        model.addAttribute("proyectos", proyectoService.listarProyectos()); //Se listan los proyectos disponibles
         return "tareas/formulario";
     }
 
     @PostMapping
-public String guardarTarea(@ModelAttribute Tarea tarea, 
-                           @RequestParam(required = false) List<Long> proyectosSeleccionados) {
-    if (proyectosSeleccionados != null && !proyectosSeleccionados.isEmpty()) {
-        Set<Proyecto> proyectos = new HashSet<>(proyectoService.obtenerProyectosPorIds(proyectosSeleccionados));
-        tarea.setProyectos(proyectos);
-    } else {
-        tarea.setProyectos(new HashSet<>());
+    public String guardarTarea(@ModelAttribute Tarea tarea, @RequestParam(required = false) Long proyectoId, Model model) {
+        if (proyectoId == null || proyectoId <= 0) {
+            model.addAttribute("error", "Debes seleccionar un proyecto válido.");
+            model.addAttribute("tarea", tarea);
+            model.addAttribute("proyectos", proyectoService.listarProyectos()); // Para volver a mostrar los proyectos disponibles
+            return "tareas/formulario"; // Volvemos al formulario con el mensaje de error
+        }
+    
+        tareaService.guardarTarea(tarea, proyectoId);
+        return "redirect:/tareas";
     }
-
-    // ✅ Llamar a la versión corregida de guardarTarea
-    tareaService.guardarTarea(tarea, proyectosSeleccionados);
-    return "redirect:/tareas";
-}
+    
 
     @GetMapping("/editar/{id}")
     public String mostrarFormularioEditarTarea(@PathVariable Long id, Model model) {
         Tarea tarea = tareaService.obtenerTareaPorId(id)
                 .orElseThrow(() -> new RuntimeException("Tarea no encontrada"));
-        
         model.addAttribute("tarea", tarea);
-        model.addAttribute("proyectos", proyectoService.listarProyectos());
+        model.addAttribute("proyectos", proyectoService.listarProyectos()); //Para reasignar la tarea a otro proyecto
         return "tareas/formulario";
     }
 
     @PostMapping("/actualizar/{id}")
     public String actualizarTarea(@PathVariable Long id, 
                                   @ModelAttribute Tarea tarea, 
-                                  @RequestParam(required = false) List<Long> proyectosSeleccionados) {
-        if (proyectosSeleccionados != null) {
-            Set<Proyecto> proyectos = new HashSet<>(proyectoService.obtenerProyectosPorIds(proyectosSeleccionados));
-            tarea.setProyectos(proyectos);
-        }
-        tareaService.actualizarTarea(id, tarea, proyectosSeleccionados);
+                                  @RequestParam Long proyectoId) { //Se reasigna a un solo proyecto
+        tareaService.actualizarTarea(id, tarea, proyectoId);
         return "redirect:/tareas";
     }
 

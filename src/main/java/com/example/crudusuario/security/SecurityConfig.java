@@ -17,14 +17,12 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import java.io.IOException;
 
 /**
- * Configuración de seguridad de Spring Security.
  * Define las reglas de autenticación, autorización y cifrado de contraseñas.
  */
 @Configuration // Indica que esta clase proporciona configuración a la aplicación
 class SecurityConfig {
 
     /**
-     * Configura las reglas de seguridad de la aplicación.
      * Define qué rutas son públicas y cuáles requieren autenticación.
      *
      * @param http Configuración de seguridad de Spring.
@@ -35,27 +33,24 @@ class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable()) // Desactiva CSRF para facilitar pruebas
             .authorizeHttpRequests(auth -> auth
-                // Rutas públicas (no requieren autenticación)
                 .requestMatchers("/login", "/css/**", "/js/**").permitAll()
 
-                // Rutas protegidas por roles
-                .requestMatchers("/proyectos/**").hasAnyRole("USER", "ADMIN") // Solo usuarios autenticados pueden acceder
+                .requestMatchers("/proyectos/**").hasAnyRole("USER", "ADMIN") 
                 .requestMatchers("/tareas/**").hasAnyRole("USER", "ADMIN") 
 
-                // Permitir que los usuarios autenticados accedan a admin (puede ser un error de seguridad)
-                .requestMatchers("/admin/**").hasAnyRole("USER", "ADMIN") 
+                .requestMatchers("/admin/**").hasAnyRole("ADMIN") 
 
                 // Cualquier otra ruta requiere autenticación
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginPage("/login") // Página de login personalizada
+                .loginPage("/login") 
                 .successHandler(customSuccessHandler()) // Redirige según el rol tras autenticarse
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutUrl("/logout") // URL para cerrar sesión
-                .logoutSuccessUrl("/login?logout") // Redirige tras cerrar sesión
+                .logoutUrl("/logout") 
+                .logoutSuccessUrl("/login?logout") 
                 .permitAll());
 
         return http.build();
@@ -75,12 +70,10 @@ class SecurityConfig {
                                                 HttpServletResponse response,
                                                 Authentication authentication) throws IOException, ServletException {
 
-                // Si el usuario es ADMIN, lo redirige al panel de administrador
                 if (authentication.getAuthorities().stream()
                         .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
                     response.sendRedirect("/admin/dashboard");
                 } else {
-                    // Si es un usuario normal, lo lleva a su página de inicio
                     response.sendRedirect("/home");
                 }
             }
@@ -88,8 +81,6 @@ class SecurityConfig {
     }
 
     /**
-     * Proporciona el AuthenticationManager de Spring Security.
-     * Este bean permite autenticar usuarios con la configuración definida.
      *
      * @param authConfig Configuración de autenticación.
      * @return AuthenticationManager configurado.

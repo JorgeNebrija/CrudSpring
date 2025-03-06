@@ -1,12 +1,14 @@
 package com.example.crudusuario.repository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.List;
-import com.example.crudusuario.model.Tarea;
 
+import com.example.crudusuario.model.Tarea;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.List;
+
+
+@Repository
 public interface TareaRepository extends JpaRepository<Tarea, Long> {
 
-    @Query("SELECT t FROM Tarea t JOIN t.proyectos p WHERE p.id = :proyectoId")
-    List<Tarea> findByProyecto(@Param("proyectoId") Long proyectoId);
+    //Busca todas las tareas de un proyecto específico por su ID
+    List<Tarea> findByProyectoId(Long proyectoId);
 }

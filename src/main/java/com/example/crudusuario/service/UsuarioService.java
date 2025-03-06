@@ -9,14 +9,11 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import com.example.crudusuario.model.Usuario;
 
-/**
- * Servicio que maneja la lógica de negocio para la entidad Usuario.
- * Implementa la interfaz UserDetailsService para la autenticación en Spring Security.
- */
-@Service // Marca esta clase como un servicio gestionado por Spring
+
+@Service 
 public class UsuarioService implements UserDetailsService {
     
-    private final UsuarioRepository usuarioRepository; // Repositorio para acceder a los usuarios
+    private final UsuarioRepository usuarioRepository; 
     private final PasswordEncoder passwordEncoder; // Codificador de contraseñas para seguridad
 
     /**
@@ -39,11 +36,9 @@ public class UsuarioService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Busca el usuario en la base de datos por su username
         Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
         
-        // Imprime el usuario en la consola (para depuración)
         System.out.println(usuario.toString());
 
         /*Retorna un objeto User de Spring Security con las credenciales del usuario
@@ -56,13 +51,7 @@ public class UsuarioService implements UserDetailsService {
                 .build();
     }
 
-    /**
-     * Registra un nuevo usuario en la base de datos.
-     * Antes de guardar, encripta la contraseña para mayor seguridad.
-     * 
-     * @param usuario Objeto Usuario a registrar.
-     * @return Usuario registrado con la contraseña encriptada.
-     */
+   
     public Usuario registrarUsuario(Usuario usuario) {
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword())); // Encripta la contraseña antes de guardarla
         return usuarioRepository.save(usuario);

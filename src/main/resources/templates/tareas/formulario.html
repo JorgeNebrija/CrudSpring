@@ -7,13 +7,21 @@
 </head>
 <body>
 
+    <!-- Incluir la barra de navegación -->
     <div th:replace="~{layout/navbar :: navbar}"></div>
 
     <div class="container mt-5">
         <div class="card shadow-lg p-4 bg-dark text-white">
-            <h1 class="text-center text-info mb-4" th:text="${#strings.isEmpty(tarea.id) ? 'Crear Tarea' : 'Editar Tarea'}"></h1>
+            <h1 class="text-center text-info mb-4" th:text="${tarea.id == null ? 'Crear Tarea' : 'Editar Tarea'}"></h1>
+
+            <!-- Mensaje de error si no se selecciona un proyecto válido -->
+            <p th:if="${error}" class="text-danger text-center" th:text="${error}"></p>
 
             <form th:action="@{/tareas}" th:object="${tarea}" method="post">
+                
+                <!-- ID oculto (para edición) -->
+                <input type="hidden" th:field="*{id}">
+
                 <div class="mb-3">
                     <label for="titulo" class="form-label">Título</label>
                     <input type="text" th:field="*{titulo}" class="form-control bg-secondary text-white" id="titulo" required>
@@ -38,13 +46,17 @@
                     </select>
                 </div>
 
-                <!-- Selección de múltiples proyectos -->
+                <!-- Selección de un único proyecto -->
                 <div class="mb-3">
-                    <label for="proyectos" class="form-label">Proyectos Asociados</label>
-                    <select th:field="*{proyectos}" multiple="multiple" class="form-select bg-secondary text-white" id="proyectos">
-                        <option th:each="proyecto : ${proyectos}" th:value="${proyecto.id}" th:text="${proyecto.nombre}"></option>
+                    <label for="proyecto" class="form-label">Proyecto Asociado</label>
+                    <select name="proyectoId" class="form-select bg-secondary text-white" id="proyecto" required>
+                        <option value="">-- Selecciona un Proyecto --</option>
+                        <option th:each="proyecto : ${proyectos}" 
+                                th:value="${proyecto.id}" 
+                                th:text="${proyecto.nombre}" 
+                                th:selected="${tarea.proyecto != null and tarea.proyecto.id == proyecto.id}">
+                        </option>
                     </select>
-                    <small class="form-text text-muted">Mantén presionada la tecla Ctrl (Cmd en Mac) para seleccionar múltiples proyectos.</small>
                 </div>
 
                 <div class="text-center">

@@ -2,8 +2,6 @@ package com.example.crudusuario.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "tareas")
@@ -21,26 +19,35 @@ public class Tarea {
 
     @Enumerated(EnumType.STRING)
     private EstadoTarea estado;
-    @ManyToMany(mappedBy = "tareas")
-    private Set<Proyecto> proyectos = new HashSet<>();
-    
 
-    // Getters y Setters
-    public Long getId() { return id; }
+    @ManyToOne
+    @JoinColumn(name = "proyecto_id", nullable = false) 
+    private Proyecto proyecto;
+
+    public Tarea() {}
+
+    public Tarea(String titulo, String descripcion, LocalDate fechaLimite, EstadoTarea estado, Proyecto proyecto) {
+        this.titulo = titulo;
+        this.descripcion = descripcion;
+        this.fechaLimite = fechaLimite;
+        this.estado = estado;
+        this.proyecto = proyecto;
+    }
     public void setId(Long id) { this.id = id; }
+    public Long getId() { return id; }
 
-    public String getTitulo() { return titulo; }
     public void setTitulo(String titulo) { this.titulo = titulo; }
+    public String getTitulo() { return titulo; }
 
-    public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public String getDescripcion() { return descripcion; }
 
-    public LocalDate getFechaLimite() { return fechaLimite; }
     public void setFechaLimite(LocalDate fechaLimite) { this.fechaLimite = fechaLimite; }
+    public LocalDate getFechaLimite() { return fechaLimite; }
 
-    public EstadoTarea getEstado() { return estado; }
     public void setEstado(EstadoTarea estado) { this.estado = estado; }
+    public EstadoTarea getEstado() { return estado; }
 
-    public Set<Proyecto> getProyectos() { return proyectos; }
-    public void setProyectos(Set<Proyecto> proyectos) { this.proyectos = proyectos; }
+    public void setProyecto(Proyecto proyecto) { this.proyecto = proyecto; }
+    public Proyecto getProyecto() { return proyecto; }
 }

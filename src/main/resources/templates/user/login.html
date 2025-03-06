@@ -1,32 +1,52 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Login</title> 
     <!-- Tema oscuro de Bootswatch (Darkly) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/darkly/bootstrap.min.css">
+    <script>
+        function validarFormulario() {
+            let usuario = document.getElementById("username").value;
+            let password = document.getElementById("password").value;
+            let boton = document.getElementById("btnLogin");
+
+            if (usuario.length < 5 || usuario.length > 15 || password.length < 5 || password.length > 15) {
+                boton.disabled = true;
+            } else {
+                boton.disabled = false;
+            }
+        }
+    </script>
 </head>
 <body class="d-flex justify-content-center align-items-center vh-100 bg-dark">
 
     <div class="card shadow-lg p-4 bg-secondary text-white" style="width: 400px;">
-        <h1 class="text-center text-light"> Inicia Sesión
-        </h1>
+        <h1 class="text-center text-light">Inicia Sesión</h1>
 
-        <form th:action="@{/login}" method="post">
+        <!-- Mensajes de error -->
+        <p th:if="${param.error}" class="text-danger text-center">Usuario o contraseña incorrectos. Inténtalo de nuevo.</p>
+        <p th:if="${param.logout}" class="text-success text-center">Has cerrado sesión correctamente.</p>
+
+        <form th:action="@{/login}" method="post" oninput="validarFormulario()">
             <!-- Usuario -->
             <div class="mb-3">
-                <label class="form-label"> Usuario</label>
-                <input type="text" name="username" class="form-control" placeholder="Ingrese su usuario" required>
+                <label class="form-label">Usuario</label>
+                <input type="text" id="username" name="username" class="form-control" 
+                       placeholder="Ingrese su usuario" pattern=".{5,15}" 
+                       title="Debe tener entre 5 y 15 caracteres" required>
             </div>
 
             <!-- Contraseña -->
             <div class="mb-3">
-                <label class="form-label"> Contraseña</label>
-                <input type="password" name="password" class="form-control" placeholder="Ingrese su contraseña" required>
+                <label class="form-label">Contraseña</label>
+                <input type="password" id="password" name="password" class="form-control" 
+                       placeholder="Ingrese su contraseña" pattern=".{5,15}" 
+                       title="Debe tener entre 5 y 15 caracteres" required>
             </div>
 
             <!-- Botón de Login -->
-            <button type="submit" class="btn btn-primary w-100"> Log in</button>
+            <button type="submit" id="btnLogin" class="btn btn-primary w-100" disabled>Log in</button>
         </form>
     </div>
 
